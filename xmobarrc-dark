@@ -1,0 +1,125 @@
+Config { 
+
+-- SOLARIZED HEX     16/8 TERMCOL  XTERM/HEX   L*A*B      RGB         HSB
+-- --------- ------- ---- -------  ----------- ---------- ----------- -----------
+-- base03    #002b36  8/4 brblack  234 #1c1c1c 15 -12 -12   0  43  54 193 100  21
+-- base02    #073642  0/4 black    235 #262626 20 -12 -12   7  54  66 192  90  26
+-- base01    #586e75 10/7 brgreen  240 #585858 45 -07 -07  88 110 117 194  25  46
+-- base00    #657b83 11/7 bryellow 241 #626262 50 -07 -07 101 123 131 195  23  51
+-- base0     #839496 12/6 brblue   244 #808080 60 -06 -03 131 148 150 186  13  59
+-- base1     #93a1a1 14/4 brcyan   245 #8a8a8a 65 -05 -02 147 161 161 180   9  63
+-- base2     #eee8d5  7/7 white    254 #e4e4e4 92 -00  10 238 232 213  44  11  93
+-- base3     #fdf6e3 15/7 brwhite  230 #ffffd7 97  00  10 253 246 227  44  10  99
+-- yellow    #b58900  3/3 yellow   136 #af8700 60  10  65 181 137   0  45 100  71
+-- orange    #cb4b16  9/3 brred    166 #d75f00 50  50  55 203  75  22  18  89  80
+-- red       #dc322f  1/1 red      160 #d70000 50  65  45 220  50  47   1  79  86
+-- magenta   #d33682  5/5 magenta  125 #af005f 50  65 -05 211  54 130 331  74  83
+-- violet    #6c71c4 13/5 brmagenta 61 #5f5faf 50  15 -45 108 113 196 237  45  77
+-- blue      #268bd2  4/4 blue      33 #0087ff 55 -10 -45  38 139 210 205  82  82
+-- cyan      #2aa198  6/6 cyan      37 #00afaf 60 -35 -05  42 161 152 175  74  63
+-- green     #859900  2/2 green     64 #5f8700 60 -20  65 133 153   0  68 100  60
+
+   -- appearance
+     font =         "xft:Inconsolata:size=11:bold:antialias=true"
+   , bgColor =      "#ff0000" --overwritten by xmonad
+   , fgColor =      "#ff0000" --overwritten by xmonad
+   , position =     TopP 0 0
+   , border =       BottomB
+   , borderColor =  "#586e75" --base01
+
+   -- layout
+   , sepChar =  "%"   -- delineator between plugin names and straight text
+   , alignSep = "}{"  -- separator between left-right alignment
+   , template = "%StdinReader% }{%battery% | C:%multicpu% | M:%memory% | N:%dynnetwork% | V:%volume% | %date%%trayerpad%"
+
+   -- general behavior
+   , lowerOnStart =     True    -- send to bottom of window stack on start
+   , hideOnStart =      False   -- start with window unmapped (hidden)
+   , allDesktops =      True    -- show on all desktops
+   , overrideRedirect = True    -- set the Override Redirect flag (Xlib)
+   , pickBroadest =     False   -- choose widest display (multi-monitor)
+   , persistent =       True    -- enable/disable hiding (True = disabled) 
+   -- plugins
+   --   Numbers can be automatically colored according to their value. xmobar
+   --   decides color based on a three-tier/two-cutoff system, controlled by
+   --   command options:
+   --     --Low sets the low cutoff
+   --     --High sets the high cutoff
+   --
+   --     --low sets the color below --Low cutoff
+   --     --normal sets the color between --Low and --High cutoffs
+   --     --High sets the color above --High cutoff
+   --
+   --   The --template option controls how the plugin is displayed. Text
+   --   color can be set by enclosing in <fc></fc> tags. For more details
+   --   see http://projects.haskell.org/xmobar/#system-monitor-plugins.
+   , commands =  [ 
+               
+        -- network activity monitor (dynamic interface resolution)
+        -- <dev> to get wlo1, enps025 etc.
+        Run DynNetwork     [ "--template"   , "<tx>/<rx>kB/s"
+                             , "--Low"      , "1000"       -- units: kB/s
+                             , "--High"     , "5000"       -- units: kB/s
+                           --, "--low"      , "darkgreen"
+                             , "--normal"   , "#cb4b16" -- SolarOrange
+                             , "--high"     , "#dc322f" -- SolarRed
+                            ] 10
+
+	-- stdin of workspaces etc.
+	, Run StdinReader	
+
+        -- cpu activity monitor
+        , Run MultiCpu       [ "--template" , "<total0>/<total1>%"
+                             , "--Low"      , "30"         -- units: %
+                             , "--High"     , "70"         -- units: %
+                           --, "--low"      , "darkgreen"
+                             , "--normal"   , "#cb4b16" -- SolarOrange
+                             , "--high"     , "#dc322f" -- SolarRed
+                            ] 10
+
+        -- cpu core temperature monitor
+        --, Run CoreTemp       [ "--template" , "Temp: <core0>°C|<core1>°C"
+        --                     , "--Low"      , "70"        -- units: °C
+        --                    , "--High"     , "80"        -- units: °C
+        --                     , "--low"      , "darkgreen"
+        --                     , "--normal"   , "darkorange"
+        --                     , "--high"     , "darkred"
+        --                     ] 50
+                          
+        -- memory usage monitor
+        , Run Memory         [ "--template" ,"<usedratio>%"
+                             , "--Low"      , "30"        -- units: %
+                             , "--High"     , "90"        -- units: %
+                           --, "--low"      , "darkgreen"
+                           --, "--normal"   , "#cb4b16" -- SolarOrange
+                             , "--high"     , "#dc322f" -- SolarRed
+                            ] 10
+
+        -- battery monitor
+        , Run Battery        [ "--template" , "<acstatus>"
+                             , "--Low"      , "15"        -- units: %
+                             , "--High"     , "80"        -- units: %
+                             , "--low"      , "#dc322f" -- SolarRed
+                             --, "--normal"   , "darkorange"
+                             --, "--high"     , "darkgreen"
+
+                             , "--" -- battery specific options
+                                       -- discharging status
+                                       , "-o"	, "Bat: <left>% (<timeleft>)"
+                                       -- AC "on" status / charging
+                                       , "-O"	, "AC:<left>%"
+                                       -- charged status / charged
+                                       , "-i"	, "AC Full"
+                             ] 50
+
+        -- Volume
+	, Run Com "/home/jonas/.bin/xmobar-volume.sh" [] "volume" 10
+
+        -- time and date indicator 
+        --   (%F = y-m-d date, %a = day of week, %T = h:m:s time)
+        , Run Date           "%F (%a) %T" "date" 5
+
+	-- Custom padding to allow trayer-srg to expand
+	, Run Com "/home/jonas/.xmonad/trayer-padding-icon.sh" [] "trayerpad" 10 
+        ]
+   }

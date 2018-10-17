@@ -1,0 +1,29 @@
+module MyColors where
+
+import Solarized
+
+-- Colors: xmonad
+myNormalBorderColor = solarizedBase1
+myFocusedBorderColor = solarizedRed
+
+
+-- Colors: xmobar
+myXmFgColor = solarizedBase00
+myXmBgColor = solarizedBase3
+myXmTitleColor = solarizedGreen
+myXmCurrentWSColor = solarizedRed
+myXmVisibleWSColor = solarizedYellow
+myXmUrgentWSColor = solarizedMagenta
+
+
+-- Colors: trayer
+myTrBgColor = tail myXmBgColor -- remove the # prefix
+
+
+-- Colors: dMenu
+myDMNormalBGColor = "'" ++ myXmBgColor ++ "'" 
+myDMSelectedBGColor = "'" ++ solarizedBase2 ++ "'"
+myDMNormalFGColor = "'" ++ myXmFgColor ++ "'"
+myDMSelectedFGColor = "'" ++ myDMNormalFGColor ++ "'"
+
+

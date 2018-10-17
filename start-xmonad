@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# xmonad startup script. Intended to be run from .xinitrc
+# as 'exec ~/.xmonad/start-xmonad'
+
+
+## Gnome keyring daemon
+eval $(gnome-keyring-daemon --start --daemonize)
+export SSH_AUTH_SOCK
+ 
+
+## xautolock
+# /usr/bin/xautolock -detectsleep -time 10 -locker "/usr/bin/slock" -killtime 20 -killer "~/.bin/xautolock-killer-suspend-if-discharging.sh" &
+systemctl --user start xautolock.service
+
+## Disable touchpad when typing
+#syndaemon -d -i 2.0 
+
+## srandrd daemon to setup monitors
+srandrd ~/.bin/handle-ext-monitors.sh
+
+## Background
+if [ -f ~/.fehbg ]; then
+    ~/.fehbg
+    logger ".fehbg exists"
+else
+    #feh --bg-center ~/projects/arch-background/1440p-archlinux-logo-solarized-dark.png
+    logger ".fehbg does not exist"
+fi
+
+## Music Player Daemon (mpd)
+# -s file exist and size greater than zero
+[ -z $(pgrep mpd) ] && mpd
+
+## udiskie (udisk wrapper for automount)
+udiskie --tray &
+
+## XMonad
+# /usr/bin/xmonad is a minimal xmonad which looks for xmonad-<arch>-<platform>
+# in ~/.xmonad and runs that instead if found. Hence in a user configured xmonad
+# environment ~/.xmonad/xmonad-x86_64-linux is running.
+exec xmonad
